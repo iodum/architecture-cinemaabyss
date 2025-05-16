@@ -1,0 +1,44 @@
+@startuml
+title CinemaAbyss Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Пользователь")
+
+AddElementTag("event", $bgColor="#444444")
+
+Container_Boundary(c, "") {
+    Container(api, "Proxy Service (API Gateway)", "Node.js", "Маршрутизирует запросы")
+
+    Container(users, "User Service", "Go", "Управляет добавлением, авторизаций пользователя, подписками пользователя")
+    Container(payment, "Payment Service", "Go", "Обрабатывает платежи")
+    Container(movies, "Movies Service", "Go", "Обрабатывает метаданные фильмов")
+
+    ContainerQueue(events, "Event Service", "Go, Kafka","Обрабатывает коммуникацию между сервисами ", $tags="event")
+
+    ContainerDb(usersDB, "User DB", "PostgreSQL", "Хранение данных о пользователях")
+    ContainerDb(paymentDB, "Payment DB", "PostgreSQL", "Хранение данных о платежах")
+    ContainerDb(moviesDB, "Movies DB", "PostgreSQL", "Хранение данных о фильмах")
+}
+
+System_Ext(payment_sys, "Платежные системы", "Внешние платежные системы")
+
+
+Rel(user, api, "Использует систему")
+Rel(api,users,"Использует сервис")
+Rel(api,movies,"Использует сервис")
+Rel(api,payment,"Использует сервис")
+
+Rel(payment,payment_sys,"Обработка платежей")
+
+BiRel(users,events,"Обработка событий")
+BiRel(movies,events,"Обработка событий")
+BiRel(payment,events,"Обработка событий")
+
+Rel(users,usersDB,"Чтение и запись данных")
+Rel(payment,paymentDB,"Чтение и запись данных")
+Rel(movies,moviesDB,"Чтение и запись данных")
+
+@enduml
