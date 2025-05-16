@@ -8,6 +8,6 @@ RUN npm install --production
 
 COPY . .
 
-EXPOSE 8082
+EXPOSE 8000
 
-CMD ["node", "events.js"]
+CMD ["node", "proxy.js"]
